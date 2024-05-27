@@ -1,4 +1,4 @@
-# Lucci v1.0
+# Lucci v1.0 (Alpha)
 
 Social discord bot. Helps manage roles and boosts engagement 
 
@@ -43,7 +43,7 @@ while others like truth or dare will facilitate discussion
 * Code Cleanup
 * Add 
 
-## Installation instruction
+## Installation instruction (For Self-Hosting Only)
 
 1. If not installed, install python 3.12
 2. Install MongoDB
