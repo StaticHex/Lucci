@@ -50,11 +50,15 @@ while others like truth or dare will facilitate discussion
 3. Install all required python modules using pip
 4. Upload html docs somewhere they're publically accessible
 5. Create a new file called `.env` and add the following to it
-
 ```
 DISCORD_TOKEN=<token for bot>
 USER_HELP=<url to userdoc_EE8B01.html>
 ADMIN_HELP=<url to admindoc_CB4E4A.html>
+```
+6. [Optional] If running Linux, you can add the following line to your crontab
+   to start the bot automatically
+```
+*/5 * * * * bash -c 'cd /path/to/Lucci; ./start.sh'
 ```
 
 ## Setup
