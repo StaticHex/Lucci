@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Lucci User Documentation</title>
+        <meta content="Lucci User Documentation" property="og:title" />
+        <meta content="Documentation For Lucci's Commands" property="og:description" />
+        <meta content="https://teragentech.net/admindoc_CB4E4A.html" property="og:url" />
+        <meta content="#43B581" data-react-helmet="true" name="theme-color" />
+        <style>
+            body {
+                background-color: #181818;
+                color: white;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            p {
+                color: white;
+                margin-left: 10px;
+            }
+            b, h3 {
+                color: #DDFFFF;
+                font-family: 'Courier New', Courier, monospace;
+            }
+            .arg {
+                color:#FFFFCC;
+                font-family: 'Courier New', Courier, monospace;
+            }
+            .type {
+                color:#CCFFCC;
+                font-family: 'Courier New', Courier, monospace;
+            }
+            .req{
+                color:#FFDDDD;
+                font-family: 'Courier New', Courier, monospace;
+            }
+            .opt {
+                color:#CCDDFF;
+                font-family: 'Courier New', Courier, monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>User Commands</h1>
+        <p>
+            <h3>daily</h3>
+            Allows the user to collect a daily bonus can also activate with !daily
+        </p>
+        <p>
+            <h3>help</h3>
+            Posts a link to the help document for this bot can also activate with !help
+        </p>
+        <p>
+            <h3>members</h3>
+            Prints metrics about the server's player count can also activate with !members
+        </p>
+        <p>
+            <h3>nextrank</h3>
+            Displays how close the user is from reaching the next rank can also activate with !nextrank
+        </p>
+        <p>
+            <h3>richest</h3>
+            Displays a list of users ranked by money earned can also activate with !richest
+        </p>
+        <p>
+            <h3>whoami</h3>
+            Prints out user's discord name and id can also activate with !whoami
+        </p>
+        <p>
+            <h3>work</h3>
+            Allows the user to work to earn cookies can also activate with !work
+        </p>
+        <h1>Admin Commands</h1>
+        <p>
+            <h3>
+                add_rank_up_role 
+                <span class="arg">rank</span>:<span class="type">Number</span> 
+                <span class="arg">to_add</span>:<span class="type">discord.Role</span> 
+                <span class="arg">to_remove</span>:<span class="type">discord.Role</span>
+            </h3>
+            Used to assign new roles to rank up levels. Note, for now this is limited to one 
+            choice for add and remove due to discord limitations so just run the command 
+            multiple times, sorry :(
+
+            <h4>Parameters:</h4>
+            <ul>
+                <li><span class="arg">rank</span> : <span class="type">Number</span> <span class="req">[Required]</span> - The rank to add role mappings to</li>
+                <li><span class="arg">to_add</span> : <span class="type">discord.Role</span> <span class="opt">[Optional]</span> - A role to add when the specified rank is reached</li>
+                <li><span class="arg">to_remove</span> : <span class="type">discord.Role</span> <span class="opt">[Optional]</span> - A role to remove when the specified rank is reached</li>
+            </ul>
+        </p>
+        <p>
+            <h3>
+                set_bot_channel 
+                <span class="arg">channel</span>:<span class="type">TextChannel</span>
+            </h3>
+            Used to set the channel for the bot to post updates to
+
+            <h4>Parameters:</h4>
+            <ul>
+                <li><span class="arg">channel</span> : <span class="type">TextChannel</span> <span class="req">[Required]</span> - The channel to set as the channel for the bot to operate on</li>
+            </ul>
+        </p>
+        <p>
+            <h3>
+                set_daily_limits <span class="arg">daily_min</span>:<span class="type">Number</span>
+                <span class="arg">daily_max</span>:<span class="type">Number</span>
+            </h3>
+            Used to set the max/min cookie values for the daily command
+
+            <h4>Parameters:</h4>
+            <ul>
+                <li><span class="arg">daily_min</span> : <span class="type">Number</span> <span class="opt">[Optional]</span> - The minimum number of cookies to award for the daily command</li>
+                <li><span class="arg">daily_max</span> : <span class="type">Number</span> <span class="opt">[Optional]</span> - The minimum number of cookies to award for the daily command</li>
+            </ul>
+        </p>
+        <p>
+            <h3>
+                set_pay_limits 
+                <span class="arg">min_pay</span>:<span class="type">Number</span>
+                <span class="arg">max_pay</span>:<span class="type">Number</span>
+            </h3>
+            Used to set the max/min cookie values for the daily command
+
+            <h4>Parameters:</h4>
+            <ul>
+                <li><span class="arg">min_pay</span> : <span class="type">Number</span> <span class="opt">[Optional]</span> - The minimum number of cookies to award for the work command</li>
+                <li><span class="arg">max_pay</span> : <span class="type">Number</span> <span class="opt">[Optional]</span> - The minimum number of cookies to award for the work command</li>
+            </ul>
+        </p>                      
+        <p>
+            <h3>
+                remove_rank_up_role 
+                <span class="arg">rank</span>:<span class="type">Number</span>
+                <span class="arg">remove_from_add</span>:<span class="type">discord.Role</span>
+                <span class="arg">remove_from_remove</span>:<span class="type">discord.Role</span>
+            </h3> 
+            Used to assign new roles to rank up levels. Note, for now this is limited to one choice for add and
+                        remove due to discord limitations so just run the command multiple times, sorry :(
+
+            <h4>Parameters:</h4>
+            <ul>
+                <li><span class="arg">rank</span>:<span class="type"> Number</span> <span class="req">[Required]</span> - The rank to remove role mappings from</li>
+                <li><span class="arg">remove_from_add</span>:<span class="type"> discord.Role</span> <span class="opt">[Optional]</span> - Remove one of the roles from the roles added when the specified rank is reached</li>
+                <li><span class="arg">remove_from_remove</span>:<span class="type"> discord.Role</span> <span class="opt">[Optional]</span> - Remove one of the roles from the roles removed when the specified rank is reached</li>
+            </ul>
+        </p>
+    </body>
+</html>
