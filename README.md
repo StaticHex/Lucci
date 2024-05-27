@@ -2,12 +2,39 @@
 
 Social discord bot. Helps manage roles and boosts engagement 
 
+## About
+
+Lucci is a social engagement discord bot designed to keep users interacting with
+the server while also providing some fun extras for users to do. The bot is split
+into several major components to suit this purpose
+
+### Rank System
+
+The rank system is really the crux of this bot. The rank system allows roles to
+be assigned/removed automatically the more users chat. This provides a way for
+servers to 'age' their players automatically meaning certain channels can be
+locked down for new users which can prevent trolling and also encourage
+engagement 
+
+### Shop System (Not Yet Implemented)
+
+The shop system while not yet implemented is planned to allow users to purchase
+items and roles using cookies which are earned through games, daily bonuses,
+and working. Server owners will have full autonomy over items and effects
+
+### Games (Not Yet Implemented)
+
+Games provide entertainment for users as well as a way to keep users engaged in
+the server. Some games will mirror casino games such as blackjack and slots
+while others like truth or dare will facilitate discussion
+
 ## Dependencies
 
 * Python 3.12 or later
 * MongoDB
 * The `discord` python module
 * The `dotenv` python module
+* The `pymongo` python module
 
 ## Future Release TODO
 

@@ -15,14 +15,8 @@ class LucciServer:
         print(f"Connecting to MongoDB at {address}:{port} ...")
         self.__client = pymongo.MongoClient(f"mongodb://{address}:{port}/")
 
-        # Make sure the database exists before trying to connect to it and if it 
-        # does connect to it
-        print(f"Checking to make sure {db} exists ...")
-        if db not in self.__client.list_database_names():
-            print(f"FAIL: {db} does not exist in provided mongo instance")
-            exit(1)
-        else:
-            print(f"PASS: {db} found in MongoDB instance at {address}:{port}")
+        # Connect to the mongo database
+        print(f"Connecting to {db} ...")
         self.__db = self.__client[db]
 
         # Check to make sure required collections exist, soft failures i.e. if
