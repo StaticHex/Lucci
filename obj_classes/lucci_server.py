@@ -157,7 +157,7 @@ class LucciServer:
                 player.exp += 1
                 rank : int = self.__computeRank(player.exp, currentGuild.expCap)
                 while rank > player.rank:
-                    response = f"{user.mention} Just reached Rank {rank}! Congratulations!"
+                    response = f"{user.name} Just reached Rank {rank}! Congratulations!"
 
                     # Rank up the player
                     player.rank += 1

@@ -11,7 +11,7 @@ from discord.ext.commands import has_permissions
 import re
 import aiohttp
 import asyncio
-
+from time import sleep
 # Create a new bot
 bot = discord.Client(intents=discord.Intents.all())
 tree = discord.app_commands.CommandTree(bot)
@@ -186,52 +186,55 @@ async def on_ready():
 
 @bot.event
 async def on_message(message : discord.Message):
-    try:
-        # Rank check
-        rankUpMessage : str = await server.checkRank(message.author, message.guild)
-        currentGuild : LucciGuild = server.checkGuild(message.guild)
-        if rankUpMessage != "":
-            if currentGuild.botChannel > 0:
-                channel : discord.TextChannel = bot.get_channel(currentGuild.botChannel)
-                await channel.send(rankUpMessage)
-            else:
-                await message.channel.send(rankUpMessage)
+    if message.author == bot.user:
+        return
+    if not  message.author.bot:
+        try:
+            # Rank check
+            rankUpMessage : str = await server.checkRank(message.author, message.guild)
+            currentGuild : LucciGuild = server.checkGuild(message.guild)
+            if rankUpMessage != "":
+                if currentGuild.botChannel > 0:
+                    channel : discord.TextChannel = bot.get_channel(currentGuild.botChannel)
+                    await channel.send(rankUpMessage)
+                else:
+                    await message.channel.send(rankUpMessage)
 
-        # Command check
-        formatted : str = re.sub(r'[\t\r\ ]+', '', message.content.lower())
-        # Register !daily
-        if re.search(r'^\!daily$', formatted):
-            await message.channel.send(await server.daily(message.author, message.guild))
+            # Command check
+            formatted : str = re.sub(r'[\t\r\ ]+', '', message.content.lower())
+            # Register !daily
+            if re.search(r'^\!daily$', formatted):
+                await message.channel.send(await server.daily(message.author, message.guild))
 
-        # Register !help
-        if re.search(r'^\!help$', formatted):
-            if message.guild.get_member(message.author.id).guild_permissions.administrator:
-                await message.channel.send(os.getenv("ADMIN_HELP"))
-            else:
-                await message.channel.send(os.getenv("USER_HELP"))
+            # Register !help
+            if re.search(r'^\!help$', formatted):
+                if message.guild.get_member(message.author.id).guild_permissions.administrator:
+                    await message.channel.send(os.getenv("ADMIN_HELP"))
+                else:
+                    await message.channel.send(os.getenv("USER_HELP"))
 
-        # Register !members
-        if re.search(r'^\!members$', formatted):
-            await message.channel.send(await server.members(message.guild))
+            # Register !members
+            if re.search(r'^\!members$', formatted):
+                await message.channel.send(await server.members(message.guild))
 
-        # Register !next_rank
-        if re.search(r'^\!nextrank$', formatted):
-            await message.channel.send(await server.next_rank(message.author, message.guild))
+            # Register !next_rank
+            if re.search(r'^\!nextrank$', formatted):
+                await message.channel.send(await server.next_rank(message.author, message.guild))
 
-        # Register !richest
-        if re.search(r'^\!richest$', formatted):
-            await message.channel.send(await server.richest(message.guild))
-        
-        # Register !whoami
-        if re.search(r'^\!whoami$', formatted):
-            await message.channel.send(await server.whoami(message.author))
+            # Register !richest
+            if re.search(r'^\!richest$', formatted):
+                await message.channel.send(await server.richest(message.guild))
+            
+            # Register !whoami
+            if re.search(r'^\!whoami$', formatted):
+                await message.channel.send(await server.whoami(message.author))
 
-        # Register !work
-        if re.search(r'^\!work$', formatted):
-            await message.channel.send(await server.work(message.author))
+            # Register !work
+            if re.search(r'^\!work$', formatted):
+                await message.channel.send(await server.work(message.author))
 
-    except:
-        await message.channel.send("Something went wrong :( please contact the developer and tell them you saw: cornucopia CORNUCOPIA")
+        except:
+            await message.channel.send("Something went wrong :( please contact the developer and tell them you saw: cornucopia CORNUCOPIA")
 
 # Run bot
 bot.run(token)
