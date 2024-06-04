@@ -11,7 +11,7 @@ from discord.ext.commands import has_permissions
 import re
 import aiohttp
 import asyncio
-from time import sleep
+
 # Create a new bot
 bot = discord.Client(intents=discord.Intents.all())
 tree = discord.app_commands.CommandTree(bot)

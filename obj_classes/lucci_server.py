@@ -157,7 +157,7 @@ class LucciServer:
                 player.exp += 1
                 rank : int = self.__computeRank(player.exp, currentGuild.expCap)
                 while rank > player.rank:
-                    response = f"{user.name} Just reached Rank {rank}! Congratulations!"
+                    response = f"`{user.name}` Just reached Rank {rank}! Congratulations!"
 
                     # Rank up the player
                     player.rank += 1
@@ -240,7 +240,7 @@ class LucciServer:
             toNext : int = self.__computeExpToNext(player.rank+1,server.expCap)
             bars : int = round(20*(player.exp/toNext))
             response = textwrap.dedent(f"""\
-            {user.mention} You have {toNext-player.exp} to go until your next rank up
+            {user.mention} You are currently Rank {player.rank}, you have {toNext-player.exp} to go until your next rank up
             `{player.exp}/{toNext} [{(bars*'|'):.<20}] {round(100*(player.exp/toNext))}%`\
             """)
         except:
