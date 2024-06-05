@@ -10,14 +10,14 @@ import math
 import textwrap
 
 class LucciServer:
-    def __init__(self, address='localhost', port='27017', db='luccidb'):
+    def __init__(self, guild : discord.Guild, address : str='localhost', port : str='27017', db : str='luccidb'):
         # Create connection to MongoDb
         print(f"Connecting to MongoDB at {address}:{port} ...")
         self.__client = pymongo.MongoClient(f"mongodb://{address}:{port}/")
 
         # Connect to the mongo database
-        print(f"Connecting to {db} ...")
-        self.__db = self.__client[db]
+        print(f"Connecting to {db}_{guild.id} ...")
+        self.__db = self.__client[f'{db}_{guild.id}']
 
         # Check to make sure required collections exist, soft failures i.e. if
         # we fail, just create them
