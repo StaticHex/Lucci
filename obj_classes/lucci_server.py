@@ -8,6 +8,10 @@ import random
 import time
 import math
 import textwrap
+import datetime
+import traceback
+import codecs
+import os
 
 class LucciServer:
     def __init__(self, guild : discord.Guild, address : str='localhost', port : str='27017', db : str='luccidb'):
@@ -18,6 +22,9 @@ class LucciServer:
         # Connect to the mongo database
         print(f"Connecting to {db}_{guild.id} ...")
         self.__db = self.__client[f'{db}_{guild.id}']
+
+        self.__guild_name : str = guild.name
+        self.__guild_id : int = guild.id
 
         # Check to make sure required collections exist, soft failures i.e. if
         # we fail, just create them
@@ -44,6 +51,25 @@ class LucciServer:
         # Display message to user that everything went ok
         print(f"{db} Successfully loaded and initialized and ready to use!")
 
+    """
+    ============================================================================
+    = LOG FUNCTION                                                             =
+    = ------------------------------------------------------------------------ =
+    ============================================================================    
+    """    
+    def logError(self, code : str) -> str:
+        if not os.path.exists('./logs'):
+            os.mkdir('./logs')
+        log : codecs.StreamReaderWriter = codecs.open(
+            f"logs/lucci_{self.__guild_id}_{datetime.datetime.now().strftime("%Y%m%d")}.log", "a"
+        )
+        ts : str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        error_text = "Something went wrong :( please contact the developer and tell them you saw: {code}"
+        log.write(f"[{self.__guild_id}][{ts}]({self.__guild_name}){error_text.format(code=code)}\n")
+        log.write(f"{traceback.format_exc()}\n")
+        log.close()
+        return error_text.format(code=code)
+    
     """
     ============================================================================
     = START METHODS RELATED TO USER                                            =
@@ -174,7 +200,7 @@ class LucciServer:
                 # Update the database
                 self.__updateUser(player, ['exp','rank'])
         except:
-            response = "Something went wrong :( please contact the developer and tell them you saw: CHERRY"
+            response = self.logError("CHERRY")
         return response
     
     
@@ -213,7 +239,7 @@ class LucciServer:
                     response = f"{user.mention} You already collected your daily. You can collect in: {hoursLeft} hours, {minLeft} minutes, and {secLeft} seconds."
             self.__updateUser(player, ['money','dailyCount','lastDaily'])
         except:
-            response = "Something went wrong :( please contact the developer and tell them you saw: PINEAPPLE"
+            response = self.logError("PINEAPPLE")
         return response
 
     async def members(self, guild : discord.Guild) -> str:
@@ -229,7 +255,7 @@ class LucciServer:
             for status in statuses:
                 response += f"**{status}:** {statuses[status]}\n"
         except:
-            response = "Something went wrong :( please contact the developer and tell them you saw: STRAWBERRY"
+            response = self.logError("STRAWBERRY")
         return response    
 
     async def next_rank(self, user : discord.User, guild : discord.Guild):
@@ -244,7 +270,7 @@ class LucciServer:
             `{player.exp}/{toNext} [{(bars*'|'):.<20}] {round(100*(player.exp/toNext))}%`\
             """)
         except:
-            response = "Something went wrong :( please contact the developer and tell them you saw: WATERMELON"
+            response = self.logError("WATERMELON")
         return response
 
 
@@ -265,7 +291,7 @@ class LucciServer:
                 resp += f"{token} {(i+1):0>2} {player.name:.<40}{player.money}\n"
             response = f"```{resp}```"
         except:
-            response =  "Something went wrong :( please contact the developer and tell them you saw: BANANA"
+            response = self.logError("BANANA")
         return response
     
     async def set_daily_limits(self, guild : discord.Guild, daily_min : int = -1, daily_max : int = -1):
@@ -288,7 +314,7 @@ class LucciServer:
             else:
                 response = "Warning: Must pass in either a `daily_min` or `daily_max` with this command"
         except:
-            response = "Something went wrong :( please contact the developer and tell them you saw: DURIAN"
+            response = self.logError("DURIAN")
         return response
     
     async def set_pay_limits(self, guild : discord.Guild, min_pay : int = -1, max_pay : int = -1):
@@ -311,7 +337,7 @@ class LucciServer:
             else:
                 response = "Warning: Must pass in either a `min_pay` or `max_pay` with this command"
         except:
-            response = "Something went wrong :( please contact the developer and tell them you saw: DRAGONFRUIT"
+            response = self.logError("DRAGONFRUIT")
         return response
 
     async def set_bot_channel(self, guild : discord.Guild, channel : discord.TextChannel) -> str:
@@ -322,7 +348,7 @@ class LucciServer:
             self.__updateGuild(currentGuild,['botChannel'])
             response = f"Success! From now on I'll post status updates to {channel.name}"
         except:
-            response =  "Something went wrong :( please contact the developer and tell them you saw: LYCHEE"
+            response = self.logError("LYCHEE")
         return response
     
     async def add_rank_up_role(
@@ -377,7 +403,7 @@ class LucciServer:
             else:
                 response = "Error: Must specify either a role 'to_add' or 'to_remove' to use this command"
         except:
-            response =  "Something went wrong :( please contact the developer and tell them you saw: KIWI" 
+            response = self.logError("KIWI")
         return response
 
     async def remove_rank_up_role(
@@ -430,7 +456,7 @@ class LucciServer:
             else:
                 response = "Error: Must specify either a role 'to_add' or 'to_remove' to use this command"
         except:
-            response =  "Something went wrong :( please contact the developer and tell them you saw: COCONUT" 
+            response = self.logError("COCONUT")
         return response            
     
     async def whoami(self, user: discord.User) -> str:
@@ -438,7 +464,7 @@ class LucciServer:
         try:
             response = f"{user.mention}, you are {user.name} who has an id of {user.id}"
         except:
-            response =  "Something went wrong :( please contact the developer and tell them you saw: ORANGE"
+            response = self.logError("ORANGE")
         return response
 
     async def work(self, user: discord.User) -> str:
@@ -460,7 +486,7 @@ class LucciServer:
                 player.money += cookies
                 self.__updateUser(player, ['money','lastWork'])
         except:
-            response =  "Something went wrong :( please contact the developer and tell them you saw: APPLE"
+            response = self.logError("APPLE")
         return response
 
     def __del__(self):

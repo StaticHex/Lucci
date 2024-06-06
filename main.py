@@ -236,7 +236,8 @@ async def on_message(message : discord.Message):
                 await message.channel.send(await servers[message.guild.id].work(message.author))
 
         except:
-            await message.channel.send("Something went wrong :( please contact the developer and tell them you saw: cornucopia CORNUCOPIA")
+            response = servers[message.guild.id].logError("CORNUCOPIA")
+            await message.channel.send(response)
 
 # Run bot
 bot.run(token)
