@@ -37,49 +37,64 @@ async def register_guild(guild : discord.Guild):
     # Register daily
     @tree.command(name="daily", description="Allows the user to collect a daily bonus", guild=discord.Object(id=guild.id))
     async def daily(interaction: discord.Interaction):
-        await interaction.response.send_message(await servers[interaction.guild.id].daily(interaction.user, interaction.guild))
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.daily(interaction.user, interaction.guild))
 
     @tree.command(name="help", description="Displays help information for the bot", guild=discord.Object(id=guild.id))
     async def help(interaction : discord.Interaction):
+        await interaction.response.defer()
         if interaction.guild.get_member(interaction.user.id).guild_permissions.administrator:
-            await interaction.response.send_message(os.getenv("ADMIN_HELP"))
+            await interaction.followup.send(os.getenv("ADMIN_HELP"))
         else:
-            await interaction.response.send_message(os.getenv("USER_HELP"))
+            await interaction.followup.send(os.getenv("USER_HELP"))
 
     # Register members
     print(f"Registering members command with {guild.name}")
     @tree.command(name="members", description="Prints information about the server's player count", guild=discord.Object(id=guild.id))
     async def members(interaction: discord.Interaction):
-        await interaction.response.send_message(await servers[interaction.guild.id].members(interaction.guild))
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.members(interaction.guild))
 
     # Register next_rank
     print(f"Registering next_rank command with {guild.name}")
     @tree.command(name="nextrank", description="Displays how close the user is from reaching the next rank", guild=discord.Object(id=guild.id))
     async def next_rank(interaction: discord.Interaction):
-        await interaction.response.send_message(await servers[interaction.guild.id].next_rank(interaction.user, interaction.guild))
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.next_rank(interaction.user, interaction.guild))
 
     # Register richest
     @tree.command(name="richest", description="Displays a list of users ranked by money earned", guild=discord.Object(id=guild.id))
     async def richest(interaction: discord.Interaction):
-            await interaction.response.send_message(await servers[interaction.guild.id].richest(interaction.guild))
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.richest(interaction.guild))
 
     # Register whoami
     print(f"Registering whoami command with {guild.name}")
     @tree.command(name="whoami", description="Prints out user's discord name and id", guild=discord.Object(id=guild.id))
     async def whoami(interaction: discord.Interaction):
-            await interaction.response.send_message(await servers[interaction.guild.id].whoami(interaction.user))
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.whoami(interaction.user))
     
     # Register work
     print(f"Registering work command with {guild.name}")
     @tree.command(name="work", description="Allows the user to work to earn cookies", guild=discord.Object(id=guild.id))
     async def work(interaction: discord.Interaction):
-        await interaction.response.send_message(await servers[interaction.guild.id].work(interaction.user))
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.work(interaction.user))
 
     @tree.command(
         name="add_rank_up_role", 
         description="""Used to assign roles to rank up levels.""", 
         guild=discord.Object(id=guild.id)
     )
+
+    # Register Add Rank Up Role
     @has_permissions(administrator=True)
     async def add_rank_up_role(
         interaction : discord.Interaction, 
@@ -99,7 +114,9 @@ async def register_guild(guild : discord.Guild):
         to_remove : List[discord.Role]
             A list of roles to remove when the assigned rank is reached
         """
-        await interaction.response.send_message(await servers[interaction.guild.id].add_rank_up_role(
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.add_rank_up_role(
             interaction.guild,
             rank,
             to_add,
@@ -124,7 +141,9 @@ async def register_guild(guild : discord.Guild):
         rank: int
             The specific rank to list roles for
         """
-        await interaction.response.send_message(await servers[interaction.guild.id].list_rank_up_roles(
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.list_rank_up_roles(
             interaction.guild,
             rank
         ))
@@ -154,7 +173,9 @@ async def register_guild(guild : discord.Guild):
         remove_from_remove : List[discord.Role]
             A list of roles to remove when the assigned rank is reached
         """
-        await interaction.response.send_message(await servers[interaction.guild.id].remove_rank_up_role(
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.remove_rank_up_role(
             interaction.guild,
             rank,
             remove_from_add,
@@ -172,7 +193,9 @@ async def register_guild(guild : discord.Guild):
         channel: discord.TextChannel
             the channel to target when posting status updates like level ups
         """
-        await interaction.response.send_message(await servers[interaction.guild.id].set_bot_channel(interaction.guild, channel))
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.set_bot_channel(interaction.guild, channel))
 
     print(f"Registering set_daily_limits command with {guild.name}")
     @tree.command(name="set_daily_limits", description="Used to set the max/min cookie values for the daily command", guild=discord.Object(id=guild.id))
@@ -187,7 +210,9 @@ async def register_guild(guild : discord.Guild):
         daily_max: int
             The maximum number of cookies to award for the daily command
         """
-        await interaction.response.send_message(await servers[interaction.guild.id].set_daily_limits(interaction.guild, daily_min, daily_max))
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.set_daily_limits(interaction.guild, daily_min, daily_max))
 
     print(f"Registering set_exp_cap command with {guild.name}")
     @tree.command(name="set_exp_cap", description="Used to set the amount of experience needed to reach lvl 100", guild=discord.Object(id=guild.id))
@@ -201,8 +226,9 @@ async def register_guild(guild : discord.Guild):
         new_exp_cap: int
             The new amount of experience needed to reach max level
         """
+        await interaction.response.defer()
         server : LucciServer = servers[interaction.guild.id]
-        await interaction.response.send_message(await server.set_exp_cap(interaction.guild, new_exp_cap))
+        await interaction.followup.send(await server.set_exp_cap(interaction.guild, new_exp_cap))
 
     print(f"Registering set_pay_limits command with {guild.name}")
     @tree.command(name="set_pay_limits", description="Used to set the max/min cookie values for the work command", guild=discord.Object(id=guild.id))
@@ -217,7 +243,26 @@ async def register_guild(guild : discord.Guild):
         max_pay: int
             The maximum number of cookies to award for the work command
         """
-        await interaction.response.send_message(await servers[interaction.guild.id].set_pay_limits(interaction.guild, min_pay, max_pay))
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.set_pay_limits(interaction.guild, min_pay, max_pay))
+
+    print(f"Registering set_rank command with {guild.name}")
+    @tree.command(name="set_rank", description="Used to set a member's rank to the specified rank", guild=discord.Object(id=guild.id))
+    @has_permissions(administrator=True)
+    async def set_rank(interaction : discord.Interaction, user : discord.User, new_rank : int = 1):
+        """Used to set a member's rank to the specified rank
+
+        Parameters
+        -----------
+        user : discord.User
+            The user to set rank for
+        new_rank: int
+            The rank to set the user's rank to
+        """
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.set_rank(user, interaction.guild, new_rank))
 
     # Sync commands
     print(f"Syncing commands with {guild.name}")

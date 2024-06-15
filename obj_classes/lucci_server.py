@@ -338,17 +338,6 @@ class LucciServer:
             response = self.logError("DRAGONFRUIT")
         return response
     
-    async def set_exp_cap(self, guild : discord.Guild, new_cap : int) -> str:
-        response = ""
-        try:
-            lucciGuild : LucciGuild = self.checkGuild(guild)
-            lucciGuild.expCap = new_cap
-            self.__updateGuild(lucciGuild, ["expCap"])
-            response = f"Exp cap successfully updated to be {new_cap}"
-        except:
-            response = self.logError("MUSCADET")
-        return response
-    
     async def set_bot_channel(self, guild : discord.Guild, channel : discord.TextChannel) -> str:
         response : str = ""
         try:
@@ -360,6 +349,57 @@ class LucciServer:
             response = self.logError("LYCHEE")
         return response
     
+    async def set_exp_cap(self, guild : discord.Guild, new_cap : int) -> str:
+        response = ""
+        try:
+            lucciGuild : LucciGuild = self.checkGuild(guild)
+            lucciGuild.expCap = new_cap
+            self.__updateGuild(lucciGuild, ["expCap"])
+            response = f"Exp cap successfully updated to be {new_cap}"
+        except:
+            response = self.logError("MUSCADET")
+        return response
+    
+    async def set_rank(self, user : discord.User, guild : discord.Guild, new_rank : int):
+        response = ""
+        try:
+            # Level capping
+            if new_rank > 100:
+                new_rank = 100
+
+            lucciUser : LucciUser = self.__checkUser(user)
+            lucciGuild : LucciGuild = self.checkGuild(guild)
+            lucciUser.exp = self.__computeExpToNext(new_rank, lucciGuild.expCap)+1
+            member : discord.Member = guild.get_member(user.id)
+            if new_rank != lucciUser.rank:
+                if new_rank > lucciUser.rank:
+                    while new_rank > lucciUser.rank:
+                        # Rank up the player
+                        lucciUser.rank += 1
+                        strRank : str = str(lucciUser.rank)
+                        # After ranking up, add and remove any roles the new rank adds/removes
+                        if strRank in lucciGuild.roleMappings:
+                            for roleId in lucciGuild.roleMappings[strRank]['remove']:
+                                await member.remove_roles(guild.get_role(roleId))
+                            for roleId in lucciGuild.roleMappings[strRank]['add']:
+                                await member.add_roles(guild.get_role(roleId))
+                elif new_rank < lucciUser.rank:
+                    while new_rank < lucciUser.rank:
+                        strRank : str = str(lucciUser.rank)
+                        if strRank in lucciGuild.roleMappings:
+                            for roleId in lucciGuild.roleMappings[strRank]['add']:
+                                await member.remove_roles(guild.get_role(roleId))
+                            for roleId in lucciGuild.roleMappings[strRank]['remove']:
+                                await member.add_roles(guild.get_role(roleId))
+                        lucciUser.rank -= 1
+            
+            self.__updateUser(lucciUser,["rank"])
+            response = f"`{user.name}` Just reached Rank {new_rank}! Congratulations!"
+        except:
+            response = self.logError("PINECONE")
+        return response
+
+
     async def list_rank_up_roles(
             self,
             guild : discord.Guild,
@@ -368,17 +408,21 @@ class LucciServer:
         response = ""
         try:
             rankstr = str(rank)
+            
             lucciGuild : LucciGuild = self.checkGuild(guild)
-            response += f"```\nThe roles assigned for rank {rank} are as follows:\n"
-            response += f"- Roles added on rank up to rank {rank}:\n"
-            for role in lucciGuild.roleMappings[rankstr]["add"]:
-                drole : discord.Role = guild.get_role(role)
-                response += f"  > [{drole.id}] {drole.name}\n"
-            response += f"- Roles removed on rank up from rank {rank}:\n"
-            for role in lucciGuild.roleMappings[rankstr]["remove"]:
-                drole : discord.Role = guild.get_role(role)
-                response += f"  > [{drole.id}] {drole.name}\n"
-            response += "```\n"
+            if rankstr in lucciGuild.roleMappings:
+                response += f"```\nThe roles assigned for rank {rank} are as follows:\n"
+                response += f"- Roles added on rank up to rank {rank}:\n"
+                for role in lucciGuild.roleMappings[rankstr]["add"]:
+                    drole : discord.Role = guild.get_role(role)
+                    response += f"  > [{drole.id}] {drole.name}\n"
+                response += f"- Roles removed on rank up from rank {rank}:\n"
+                for role in lucciGuild.roleMappings[rankstr]["remove"]:
+                    drole : discord.Role = guild.get_role(role)
+                    response += f"  > [{drole.id}] {drole.name}\n"
+                response += "```\n"
+            else:
+                response = f"Rank {rankstr} does not have any roles mapped to it"
         except:
             response = self.logError("MANGO")
         return response
