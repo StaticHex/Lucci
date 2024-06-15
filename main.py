@@ -106,49 +106,29 @@ async def register_guild(guild : discord.Guild):
             to_remove
         ))
 
-    print(f"Registering set_bot_channel command with {guild.name}")
-    @tree.command(name="set_bot_channel", description="Used to set the channel id for the bot to publish status updates to", guild=discord.Object(id=guild.id))
+    print(f"Registering list_rank_up_roles command with {guild.name}")
+    @tree.command(
+        name="list_rank_up_roles", 
+        description="""Used to list out roles assigned for a given rank.""", 
+        guild=discord.Object(id=guild.id)
+    )
     @has_permissions(administrator=True)
-    async def set_bot_channel(interaction : discord.Interaction, channel : discord.TextChannel):
-        """Used to set the channel id for the bot to publish status updates to
+    async def list_rank_up_roles(
+        interaction : discord.Interaction, 
+        rank : int
+    ):
+        """Used to list out roles assigned for a given rank
 
         Parameters
         -----------
-        channel: discord.TextChannel
-            the channel to target when posting status updates like level ups
+        rank: int
+            The specific rank to list roles for
         """
-        await interaction.response.send_message(await servers[interaction.guild.id].set_bot_channel(interaction.guild, channel))
+        await interaction.response.send_message(await servers[interaction.guild.id].list_rank_up_roles(
+            interaction.guild,
+            rank
+        ))
 
-    print(f"Registering set_daily_limits command with {guild.name}")
-    @tree.command(name="set_daily_limits", description="Used to set the max/min cookie values for the daily command", guild=discord.Object(id=guild.id))
-    @has_permissions(administrator=True)
-    async def set_daily_limits(interaction : discord.Interaction, daily_min : int = -1, daily_max : int = -1):
-        """Used to set the max/min cookie values for the daily command
-
-        Parameters
-        -----------
-        daily_min: int
-            The minimum number of cookies to award for the daily command
-        daily_max: int
-            The maximum number of cookies to award for the daily command
-        """
-        await interaction.response.send_message(await servers[interaction.guild.id].set_daily_limits(interaction.guild, daily_min, daily_max))
-
-    print(f"Registering set_pay_limits command with {guild.name}")
-    @tree.command(name="set_pay_limits", description="Used to set the max/min cookie values for the work command", guild=discord.Object(id=guild.id))
-    @has_permissions(administrator=True)
-    async def set_pay_limits(interaction : discord.Interaction, min_pay : int = -1, max_pay : int = -1):
-        """Used to set the max/min cookie values for the work command
-
-        Parameters
-        -----------
-        min_pay: int
-            The minimum number of cookies to award for the work command
-        max_pay: int
-            The maximum number of cookies to award for the work command
-        """
-        await interaction.response.send_message(await servers[interaction.guild.id].set_pay_limits(interaction.guild, min_pay, max_pay))
-    
     print(f"Registering remove_rank_up_role command with {guild.name}")
     @tree.command(
         name="remove_rank_up_role", 
@@ -180,6 +160,64 @@ async def register_guild(guild : discord.Guild):
             remove_from_add,
             remove_from_remove
         ))
+
+    print(f"Registering set_bot_channel command with {guild.name}")
+    @tree.command(name="set_bot_channel", description="Used to set the channel id for the bot to publish status updates to", guild=discord.Object(id=guild.id))
+    @has_permissions(administrator=True)
+    async def set_bot_channel(interaction : discord.Interaction, channel : discord.TextChannel):
+        """Used to set the channel id for the bot to publish status updates to
+
+        Parameters
+        -----------
+        channel: discord.TextChannel
+            the channel to target when posting status updates like level ups
+        """
+        await interaction.response.send_message(await servers[interaction.guild.id].set_bot_channel(interaction.guild, channel))
+
+    print(f"Registering set_daily_limits command with {guild.name}")
+    @tree.command(name="set_daily_limits", description="Used to set the max/min cookie values for the daily command", guild=discord.Object(id=guild.id))
+    @has_permissions(administrator=True)
+    async def set_daily_limits(interaction : discord.Interaction, daily_min : int = -1, daily_max : int = -1):
+        """Used to set the max/min cookie values for the daily command
+
+        Parameters
+        -----------
+        daily_min: int
+            The minimum number of cookies to award for the daily command
+        daily_max: int
+            The maximum number of cookies to award for the daily command
+        """
+        await interaction.response.send_message(await servers[interaction.guild.id].set_daily_limits(interaction.guild, daily_min, daily_max))
+
+    print(f"Registering set_exp_cap command with {guild.name}")
+    @tree.command(name="set_exp_cap", description="Used to set the amount of experience needed to reach lvl 100", guild=discord.Object(id=guild.id))
+    @has_permissions(administrator=True)
+    async def set_exp_cap(interaction : discord.Interaction, new_exp_cap : int):
+        """Used to set the amount of experience needed to reach lvl 100. Sets 
+        level up growth rate for the server
+
+        Parameters
+        -----------
+        new_exp_cap: int
+            The new amount of experience needed to reach max level
+        """
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.response.send_message(await server.set_exp_cap(interaction.guild, new_exp_cap))
+
+    print(f"Registering set_pay_limits command with {guild.name}")
+    @tree.command(name="set_pay_limits", description="Used to set the max/min cookie values for the work command", guild=discord.Object(id=guild.id))
+    @has_permissions(administrator=True)
+    async def set_pay_limits(interaction : discord.Interaction, min_pay : int = -1, max_pay : int = -1):
+        """Used to set the max/min cookie values for the work command
+
+        Parameters
+        -----------
+        min_pay: int
+            The minimum number of cookies to award for the work command
+        max_pay: int
+            The maximum number of cookies to award for the work command
+        """
+        await interaction.response.send_message(await servers[interaction.guild.id].set_pay_limits(interaction.guild, min_pay, max_pay))
 
     # Sync commands
     print(f"Syncing commands with {guild.name}")

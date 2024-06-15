@@ -273,8 +273,6 @@ class LucciServer:
             response = self.logError("WATERMELON")
         return response
 
-
-        
     async def richest(self, guild: discord.Guild) -> str:
         response : str = ""
         try:
@@ -339,7 +337,18 @@ class LucciServer:
         except:
             response = self.logError("DRAGONFRUIT")
         return response
-
+    
+    async def set_exp_cap(self, guild : discord.Guild, new_cap : int) -> str:
+        response = ""
+        try:
+            lucciGuild : LucciGuild = self.checkGuild(guild)
+            lucciGuild.expCap = new_cap
+            self.__updateGuild(lucciGuild, ["expCap"])
+            response = f"Exp cap successfully updated to be {new_cap}"
+        except:
+            response = self.logError("MUSCADET")
+        return response
+    
     async def set_bot_channel(self, guild : discord.Guild, channel : discord.TextChannel) -> str:
         response : str = ""
         try:
@@ -349,6 +358,29 @@ class LucciServer:
             response = f"Success! From now on I'll post status updates to {channel.name}"
         except:
             response = self.logError("LYCHEE")
+        return response
+    
+    async def list_rank_up_roles(
+            self,
+            guild : discord.Guild,
+            rank : int
+    ):
+        response = ""
+        try:
+            rankstr = str(rank)
+            lucciGuild : LucciGuild = self.checkGuild(guild)
+            response += f"```\nThe roles assigned for rank {rank} are as follows:\n"
+            response += f"- Roles added on rank up to rank {rank}:\n"
+            for role in lucciGuild.roleMappings[rankstr]["add"]:
+                drole : discord.Role = guild.get_role(role)
+                response += f"  > [{drole.id}] {drole.name}\n"
+            response += f"- Roles removed on rank up from rank {rank}:\n"
+            for role in lucciGuild.roleMappings[rankstr]["remove"]:
+                drole : discord.Role = guild.get_role(role)
+                response += f"  > [{drole.id}] {drole.name}\n"
+            response += "```\n"
+        except:
+            response = self.logError("MANGO")
         return response
     
     async def add_rank_up_role(
