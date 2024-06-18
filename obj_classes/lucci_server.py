@@ -286,7 +286,7 @@ class LucciServer:
             resp=""
             for i, player in enumerate(ulist):
                 token = (tokens[i] if i < len(tokens) else "  ")
-                resp += f"{token} {(i+1):0>2} {player.name:.<40}{player.money}\n"
+                resp += f"{token} {(i+1):0>2} {player.name:.<40}{player.money:.>10}\n"
             response = f"```{resp}```"
         except:
             response = self.logError("BANANA")
