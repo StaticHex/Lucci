@@ -552,7 +552,7 @@ class LucciServer:
             current : int = int(time.time())
             dt = current - player.lastWork
             if dt < 3600:
-                minLeft : int = math.floor((3600 - dt) / 60)
+                minLeft : int = int(math.floor((3600 - dt) / 60))
                 secLeft : int = (3600 - dt) % 60
                 response = f"{user.mention} You are already working. You must wait {minLeft} minutes and {secLeft} seconds before working agian."
             else:
