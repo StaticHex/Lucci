@@ -222,7 +222,7 @@ class LucciServer:
 
             if dt > 86400:
                 player.dailyCount+=1
-                bonusCookies : int = max((((lucciGuild.dailyMax/0.4) - 150)/(7 - 0)) * player.dailyCount, (lucciGuild.dailyMax/0.4) - 150)
+                bonusCookies : int = min((((lucciGuild.dailyMax/0.4) - 150)/(7 - 0)) * player.dailyCount, (lucciGuild.dailyMax/0.4) - 150)
                 response = f"{user.mention} just collected their daily and got {bonusCookies} :cookie:."
                 player.money += bonusCookies
                 player.lastDaily = int(time.time())
