@@ -19,6 +19,18 @@ tree = discord.app_commands.CommandTree(bot)
 # Create connection to the mongodb server
 servers : LucciServer = {}
 guildCount : int = 0
+task = None
+async def check_rank(message : discord.Message):
+    rankUpMessage = await servers[message.guild.id].checkRank(message.author, message.guild)
+    currentGuild : LucciGuild = servers[message.guild.id].checkGuild(message.guild)
+    if rankUpMessage != "":
+        if currentGuild.botChannel > 0:
+            channel : discord.TextChannel = bot.get_channel(currentGuild.botChannel)
+            await channel.send(rankUpMessage)
+        else:
+            await message.channel.send(rankUpMessage)
+
+
 
 # Get token
 load_dotenv()
@@ -293,20 +305,15 @@ async def on_guild_remove(guild : discord.Guild):
 
 @bot.event
 async def on_message(message : discord.Message):
+    global rankUpMessage
+    global task
     if message.author == bot.user:
         return
     if not  message.author.bot:
         try:
             # Rank check
-            rankUpMessage : str = await servers[message.guild.id].checkRank(message.author, message.guild)
-            currentGuild : LucciGuild = servers[message.guild.id].checkGuild(message.guild)
-            if rankUpMessage != "":
-                if currentGuild.botChannel > 0:
-                    channel : discord.TextChannel = bot.get_channel(currentGuild.botChannel)
-                    await channel.send(rankUpMessage)
-                else:
-                    await message.channel.send(rankUpMessage)
-
+            if task == None or task.done():
+                task = bot.loop.create_task(check_rank(message))
             # Command check
             formatted : str = re.sub(r'[\t\r\ ]+', '', message.content.lower())
             # Register !daily
