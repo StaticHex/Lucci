@@ -84,6 +84,21 @@ async def register_guild(guild : discord.Guild):
         server : LucciServer = servers[interaction.guild.id]
         await interaction.followup.send(await server.richest(interaction.guild))
 
+    # Register user rank
+    print(f"Registering user_rank command with {guild.name}")
+    @tree.command(name="userrank", description="Displays how close target user is from reaching the next rank", guild=discord.Object(id=guild.id))
+    async def user_rank(interaction: discord.Interaction, user :discord.User):
+        """Displays how close target user is from reaching the next rank
+
+        Parameters
+        -----------
+        user: discord.User
+            The user to check rank for
+        """
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.next_rank(user, interaction.guild))
+
     # Register whoami
     print(f"Registering whoami command with {guild.name}")
     @tree.command(name="whoami", description="Prints out user's discord name and id", guild=discord.Object(id=guild.id))
