@@ -328,7 +328,7 @@ class LucciServer:
                         # 9. Check if the mug succeeds
                         if mugChance < random.randint(0,100):
                             # 10. Calculate how many cookies to steal
-                            coins = 0, random.randint(1, int(round((victim.money/100)*2)))
+                            coins = random.randint(1, int(round((victim.money/100)*2)))
                             # 11. deduct coins from victim, set timer, and increment mug count
                             victim.money= max(victim.money - coins, 0)
                             victim.mugCount+=1
