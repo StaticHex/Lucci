@@ -300,7 +300,7 @@ class LucciServer:
             mugChance = 0
 
             # 1. Check user can actually be mugged
-            if originator.bot:
+            if not target.bot:
                 if victim.money > 0:
                     # 2. Check if it's been at least 1 hour since last mugging
                     if cooldown_dt > 3600:

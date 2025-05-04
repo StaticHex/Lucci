@@ -87,14 +87,17 @@ and 150 cookies per use. If you wish you can change these values by running
 #### daily
 Allows the user to collect a daily bonus
 
+#### leaderboard
+Displays a list of users ranked by money earned
+
 #### members
 Prints metrics about the server's player count
 
+#### mug
+Allows users to mug each other for cookies
+
 #### next_rank
 Displays how close the user is from reaching the next rank
-
-#### richest
-Displays a list of users ranked by money earned
 
 #### whoami
 Prints out user's discord name and id
