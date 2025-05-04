@@ -90,7 +90,7 @@ class LucciServer:
     
     def __updateUser(self, user : LucciUser, fields : List[str] = []):
         userDict = user.toDict()
-        if len(fields):    
+        if len(fields):
             internal = {}
             for li in fields:
                 internal[li] = userDict[li]
@@ -242,6 +242,36 @@ class LucciServer:
             response = self.logError("PINEAPPLE")
         return response
 
+    
+    async def leaderboard(self, guild: discord.Guild, ltype : str) -> str:
+        response : str = ""
+        try:
+            ulist : List[LucciUser] = []
+            for member in guild.members:
+                if not member.bot:
+                    player : LucciUser = self.__checkUser(member)
+                    ulist.append(player)
+            if ltype == 'exp':
+                ulist = sorted(ulist, key=lambda x: x.exp, reverse=True)[0:10]
+            elif ltype == 'rank':
+                ulist = sorted(ulist, key=lambda x: x.rank, reverse=True)[0:10]
+            else:
+                ulist = sorted(ulist, key=lambda x: x.money, reverse=True)[0:10]
+            tokens = ['🥇', '🥈','🥉']
+            resp=f""
+            for i, player in enumerate(ulist):
+                token = (tokens[i] if i < len(tokens) else "  ")
+                if ltype == 'exp':
+                    resp += f"{token} {(i+1):0>2} {player.name:.<40}{int(player.exp):.>10}\n"
+                elif ltype == 'rank':
+                    resp += f"{token} {(i+1):0>2} {player.name:.<40}{int(player.rank):.>10}\n"
+                else:
+                    resp += f"{token} {(i+1):0>2} {player.name:.<40}{int(player.money):.>10}\n"
+            response = f"**{ltype.title()} Leaderboard**\n```{resp}```"
+        except:
+            response = self.logError("BANANA")
+        return response
+
     async def members(self, guild : discord.Guild) -> str:
         response : str = ""
         try:
@@ -256,6 +286,76 @@ class LucciServer:
                 response += f"**{status}:** {statuses[status]}\n"
         except:
             response = self.logError("STRAWBERRY")
+        return response
+    
+    async def mug(self, guild: discord.Guild, originator : discord.User, target : discord.User) -> str:
+        response : str = ""
+        try:
+            server : LucciGuild = self.checkGuild(guild)
+            mugger : LucciUser = self.__checkUser(originator)
+            victim : LucciUser  = self.__checkUser(target)
+            current : int = int(time.time())
+            cooldown_dt = current - mugger.mugCooldown
+            dateline_dt = current - victim.mugTimer
+            mugChance = 0
+
+            # 1. Check user can actually be mugged
+            if originator.bot:
+                if victim.money > 0:
+                    # 2. Check if it's been at least 1 hour since last mugging
+                    if cooldown_dt > 3600:
+                        # 3. Check if it's been 24 hours since last mugging, if so, reset mugging counter to 0 and update mug timer
+                        if dateline_dt > 86400:
+                            victim.mugCount = 0
+                        # 4. Get leaderboard data for cookies
+                        ulist : List[LucciUser] = []
+                        for member in guild.members:
+                            if not member.bot:
+                                player : LucciUser = self.__checkUser(member)
+                                ulist.append(player)
+                        # 5. Compare users cookies to leaderboard
+                        ulist = sorted(ulist, key=lambda x: x.money, reverse=True)[0:10]
+
+                        # 6. Calculate chance of mugging = int((cookies / leader) * 100)
+                        mugChance = int(round(victim.money / ulist[0].money * 100)) 
+                        
+                        # 7. Subtract 10*mug counter from chance and then increment mug counter
+                        mugChance -= 10*victim.mugCount
+
+                        # 8. Clamp mug chance at 10%
+                        mugChance = max(10, mugChance)
+
+                        # 9. Check if the mug succeeds
+                        if mugChance < random.randint(0,100):
+                            # 10. Calculate how many cookies to steal
+                            coins = 0, random.randint(1, int(round((victim.money/100)*2)))
+                            # 11. deduct coins from victim, set timer, and increment mug count
+                            victim.money= max(victim.money - coins, 0)
+                            victim.mugCount+=1
+                            victim.mugTimer = int(time.time())
+
+                            # 12. add coins to mugger, and adjust cooldown
+                            mugger.money+= coins
+                            mugger.mugCooldown = int(time.time())
+
+                            # 13. Update database
+                            self.__updateUser(victim, ["money","mugCount","mugTimer"])
+                            self.__updateUser(mugger, ["money","mugCooldown"])
+                            response = f"{mugger.name} just stole {coins} cookies from {victim.name}."
+                        else:
+                            mugger.mugCooldown = int(time.time())
+                            self.__updateUser(mugger, ["mugCooldown"])
+                            response = f"{mugger.name} just tried to mug {victim.name} and failed."
+                    else:
+                        response = f"You must wait {(3600 - cooldown_dt) // 60} "
+                        response+= f"minutes and {(3600 - cooldown_dt) % 60} seconds "
+                        response+= f"before using this command again"
+                else:
+                    response = f"{victim.name} doesn't have any cookies to steal"
+            else:
+                response = f"You can't mug bots"
+        except:
+            response = self.logError("ANCIENT BERRY")
         return response    
 
     async def next_rank(self, user : discord.User, guild : discord.Guild):
@@ -271,25 +371,6 @@ class LucciServer:
             """)
         except:
             response = self.logError("WATERMELON")
-        return response
-
-    async def richest(self, guild: discord.Guild) -> str:
-        response : str = ""
-        try:
-            ulist : List[LucciUser] = []
-            for member in guild.members:
-                if not member.bot:
-                    player : LucciUser = self.__checkUser(member)
-                    ulist.append(player)
-            ulist = sorted(ulist, key=lambda x: x.money, reverse=True)[0:10]
-            tokens = ['🥇', '🥈','🥉']
-            resp=""
-            for i, player in enumerate(ulist):
-                token = (tokens[i] if i < len(tokens) else "  ")
-                resp += f"{token} {(i+1):0>2} {player.name:.<40}{player.money:.>10}\n"
-            response = f"```{resp}```"
-        except:
-            response = self.logError("BANANA")
         return response
     
     async def set_daily_limits(self, guild : discord.Guild, daily_min : int = -1, daily_max : int = -1):

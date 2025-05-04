@@ -2,7 +2,7 @@ from __future__ import print_function, division
 from obj_classes.lucci_user import LucciUser
 from obj_classes.lucci_guild import LucciGuild
 from obj_classes.lucci_server import LucciServer
-from typing import Dict, List
+from typing import Dict, List, Optional
 import os
 from dotenv import load_dotenv
 #from discord.ext import commands
@@ -61,6 +61,21 @@ async def register_guild(guild : discord.Guild):
         else:
             await interaction.followup.send(os.getenv("USER_HELP"))
 
+    # Register leaderboard
+    print(f"Registering leaderboard command with {guild.name}")
+    @tree.command(name="leaderboard", description="Displays a list of users ranked by money earned", guild=discord.Object(id=guild.id))
+    @discord.app_commands.choices(choice_option=[
+        discord.app_commands.Choice(name='Cookies', value='cookie'),
+        discord.app_commands.Choice(name='Exp', value='exp'),
+        discord.app_commands.Choice(name='Rank', value='rank')
+    ])
+    async def leaderboard(interaction: discord.Interaction, choice_option: str = None):
+        if not choice_option:
+            choice_option = 'cookie'
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.leaderboard(interaction.guild, choice_option))
+
     # Register members
     print(f"Registering members command with {guild.name}")
     @tree.command(name="members", description="Prints information about the server's player count", guild=discord.Object(id=guild.id))
@@ -69,32 +84,20 @@ async def register_guild(guild : discord.Guild):
         server : LucciServer = servers[interaction.guild.id]
         await interaction.followup.send(await server.members(interaction.guild))
 
+    # Register mug
+    print(f"Registering mug command with {guild.name}")
+    @tree.command(name="mug", description="Used to steal cookies from another player", guild=discord.Object(id=guild.id))
+    async def mug(interaction: discord.Interaction, target : discord.User):
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.mug(interaction.guild, interaction.user, target))
+
     # Register next_rank
     print(f"Registering next_rank command with {guild.name}")
     @tree.command(name="nextrank", description="Displays how close the user is from reaching the next rank", guild=discord.Object(id=guild.id))
-    async def next_rank(interaction: discord.Interaction):
-        await interaction.response.defer()
-        server : LucciServer = servers[interaction.guild.id]
-        await interaction.followup.send(await server.next_rank(interaction.user, interaction.guild))
-
-    # Register richest
-    @tree.command(name="richest", description="Displays a list of users ranked by money earned", guild=discord.Object(id=guild.id))
-    async def richest(interaction: discord.Interaction):
-        await interaction.response.defer()
-        server : LucciServer = servers[interaction.guild.id]
-        await interaction.followup.send(await server.richest(interaction.guild))
-
-    # Register user rank
-    print(f"Registering user_rank command with {guild.name}")
-    @tree.command(name="userrank", description="Displays how close target user is from reaching the next rank", guild=discord.Object(id=guild.id))
-    async def user_rank(interaction: discord.Interaction, user :discord.User):
-        """Displays how close target user is from reaching the next rank
-
-        Parameters
-        -----------
-        user: discord.User
-            The user to check rank for
-        """
+    async def next_rank(interaction: discord.Interaction, user :discord.User=None):
+        if not user:
+            user = interaction.user
         await interaction.response.defer()
         server : LucciServer = servers[interaction.guild.id]
         await interaction.followup.send(await server.next_rank(user, interaction.guild))
@@ -350,9 +353,12 @@ async def on_message(message : discord.Message):
             if re.search(r'^\!nextrank$', formatted):
                 await message.channel.send(await servers[message.guild.id].next_rank(message.author, message.guild))
 
-            # Register !richest
-            if re.search(r'^\!richest$', formatted):
-                await message.channel.send(await servers[message.guild.id].richest(message.guild))
+            # Register !leaderboard
+            if re.search(r'^\!leaderboard$', formatted):
+                await message.channel.send(await servers[message.guild.id].leaderboard(message.guild, "cookie"))
+
+            if re.search(r'^\!mug$', formatted):
+                await message.channel.send("Cannot use mug like this due to optional paramters, use /mug instead")
             
             # Register !whoami
             if re.search(r'^\!whoami$', formatted):

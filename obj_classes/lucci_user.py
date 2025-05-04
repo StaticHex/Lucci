@@ -15,6 +15,9 @@ class LucciUser:
             messageCount : int = 0,
             timeoutValue : int = 0,
             timeoutExpire : int = 0,
+            mugTimer : int = 0,
+            mugCooldown : int = 0,
+            mugCount : int = 0,
             exp : int = 0,
             rank : int = 0,
             _id : Any = None # Just here to avoid runtime error with pymongo
@@ -29,6 +32,9 @@ class LucciUser:
         self.messageCount : int = messageCount
         self.timeoutValue : int = timeoutValue
         self.timeoutExpire : int = timeoutExpire
+        self.mugTimer : int = mugTimer
+        self.mugCooldown : int = mugCooldown
+        self.mugCount : int = mugCount
         self.exp : int = exp
         self.rank : int = rank
     
@@ -44,6 +50,9 @@ class LucciUser:
             "messageCount":self.messageCount,
             "messageCount":self.timeoutValue,
             "timeoutExpire":self.timeoutExpire,
+            "mugTimer":self.mugTimer,
+            "mugCooldown":self.mugCooldown,
+            "mugCount":self.mugCount,
             "exp":self.exp,
             "rank":self.rank
         }
