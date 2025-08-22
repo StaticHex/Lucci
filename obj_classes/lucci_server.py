@@ -2,6 +2,7 @@ import pymongo
 import pymongo.cursor
 from obj_classes.lucci_user import LucciUser
 from obj_classes.lucci_guild import LucciGuild
+from pymongo.server_api import ServerApi
 from typing import List
 import discord
 import random
@@ -17,7 +18,11 @@ class LucciServer:
     def __init__(self, guild : discord.Guild, address : str='localhost', port : str='27017', db : str='luccidb'):
         # Create connection to MongoDb
         print(f"Connecting to MongoDB at {address}:{port} ...")
-        self.__client = pymongo.MongoClient(f"mongodb://{address}:{port}/")
+        if address == 'localhost':
+            self.__client = pymongo.MongoClient(f"mongodb://{address}:{port}/")
+        else:
+            self.__client = pymongo.MongoClient(address, server_api=ServerApi('1'))
+
 
         # Connect to the mongo database
         print(f"Connecting to {db}_{guild.id} ...")

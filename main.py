@@ -35,6 +35,7 @@ async def check_rank(message : discord.Message):
 # Get token
 load_dotenv()
 token=os.getenv("DISCORD_TOKEN")
+uri=os.getenv("MONGO_URI")
 
 async def register_guild(guild : discord.Guild):
     global servers
@@ -43,7 +44,10 @@ async def register_guild(guild : discord.Guild):
     # Guild debug
     print(f"- id: {guild.id}, name: {guild.name}")
 
-    servers[guild.id] = LucciServer(guild)
+    servers[guild.id] = LucciServer(
+        guild=guild, 
+        address=uri
+    )
     guildCount+=1
 
     # Register daily
