@@ -322,7 +322,7 @@ class LucciServer:
                         ulist = sorted(ulist, key=lambda x: x.money, reverse=True)[0:10]
 
                         # 6. Calculate chance of mugging = int((cookies / leader) * 100)
-                        mugChance = int(round(victim.money / ulist[0].money * 100)) 
+                        mugChance = int(round((victim.money / ulist[0].money) * 100)) 
                         
                         # 7. Subtract 10*mug counter from chance and then increment mug counter
                         mugChance -= 10*victim.mugCount
@@ -331,7 +331,7 @@ class LucciServer:
                         mugChance = max(10, mugChance)
 
                         # 9. Check if the mug succeeds
-                        if mugChance < random.randint(0,100):
+                        if mugChance >= random.randint(0,100):
                             # 10. Calculate how many cookies to steal
                             coins = random.randint(1, int(round((victim.money/100)*2)))
                             # 11. deduct coins from victim, set timer, and increment mug count
