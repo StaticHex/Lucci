@@ -222,10 +222,10 @@ class LucciServer:
         try:
             if target:
                 player : LucciUser = self.__checkUser(target)
-                response = f"{target.mention} has {player.money} cookies"
+                response = f"{target.display_name} has {player.money} cookies"
             else:
                 player : LucciUser = self.__checkUser(user)
-                response = f"{user.mention} has {player.money} cookies"
+                response = f"{user.display_name} has {player.money} cookies"
         except:
             response = self.logError("PAWPAW")
         return response
@@ -243,7 +243,7 @@ class LucciServer:
             if dt > 86400:
                 player.dailyCount+=1
                 bonusCookies : int = int(min((((lucciGuild.dailyMax/0.4) - 150)/(7 - 0)) * player.dailyCount, (lucciGuild.dailyMax/0.4) - 150))
-                response = f"{user.mention} just collected their daily and got {bonusCookies} :cookie:."
+                response = f"{user.display_name} just collected their daily and got {bonusCookies} :cookie:."
                 player.money = int(player.money + bonusCookies)
                 player.lastDaily = int(time.time())
                 if dt < 172800:
@@ -256,7 +256,7 @@ class LucciServer:
                     hoursLeft : int = math.floor(24 - (dt / 3600 ))
                     minLeft : int = math.floor((3600 - (dt % 3600)) / 60)
                     secLeft : int = (3600 - (dt % 3600)) % 60
-                    response = f"{user.mention} You already collected your daily. You can collect in: {hoursLeft} hours, {minLeft} minutes, and {secLeft} seconds."
+                    response = f"{user.display_name} You already collected your daily. You can collect in: {hoursLeft} hours, {minLeft} minutes, and {secLeft} seconds."
             self.__updateUser(player, ['money','dailyCount','lastDaily'])
         except:
             response = self.logError("PINEAPPLE")
@@ -386,7 +386,7 @@ class LucciServer:
             toNext : int = self.__computeExpToNext(player.rank+1,server.expCap)
             bars : int = round(20*(player.exp/toNext))
             response = textwrap.dedent(f"""\
-            {user.mention} You are currently Rank {player.rank}, you have {toNext-player.exp} to go until your next rank up
+            {user.display_name} You are currently Rank {player.rank}, you have {toNext-player.exp} to go until your next rank up
             `{player.exp}/{toNext} [{(bars*'|'):.<20}] {round(100*(player.exp/toNext))}%`\
             """)
         except:
@@ -404,7 +404,7 @@ class LucciServer:
 
             embed = discord.Embed(
                 title="Rock Paper Scissors",
-                description=f"{user.mention}, choose your move below!\nBet: {bet}",
+                description=f"{user.display_name}, choose your move below!\nBet: {bet}",
                 color=discord.Color.blurple()
             )
             view = RPSView(user, bet)
@@ -698,7 +698,7 @@ class LucciServer:
     async def whoami(self, user: discord.User) -> str:
         response : str = ""
         try:
-            response = f"{user.mention}, you are {user.name} who has an id of {user.id}"
+            response = f"{user.display_name}, you are {user.name} who has an id of {user.id}"
         except:
             response = self.logError("ORANGE")
         return response
@@ -714,10 +714,10 @@ class LucciServer:
             if dt < 3600:
                 minLeft : int = int(math.floor((3600 - dt) / 60))
                 secLeft : int = (3600 - dt) % 60
-                response = f"{user.mention} You are already working. You must wait {minLeft} minutes and {secLeft} seconds before working agian."
+                response = f"{user.display_name} You are already working. You must wait {minLeft} minutes and {secLeft} seconds before working agian."
             else:
                 cookies : int = random.randint(10, 150)
-                response = f"{user.mention} started working and earned {cookies} :cookie:"
+                response = f"{user.display_name} started working and earned {cookies} :cookie:"
                 player.lastWork = int(time.time())
                 player.money += cookies
                 self.__updateUser(player, ['money','lastWork'])
