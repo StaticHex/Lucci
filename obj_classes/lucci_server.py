@@ -2,8 +2,10 @@ import pymongo
 import pymongo.cursor
 from obj_classes.lucci_user import LucciUser
 from obj_classes.lucci_guild import LucciGuild
+from obj_classes.embed_rps_view import RPSView
 from pymongo.server_api import ServerApi
 from typing import List
+import asyncio
 import discord
 import random
 import time
@@ -215,6 +217,19 @@ class LucciServer:
     = ------------------------------------------------------------------------ =
     ============================================================================
     """
+    async def cookies(self, user : discord.User, target : discord.User = None):
+        response : str = ""
+        try:
+            if target:
+                player : LucciUser = self.__checkUser(target)
+                response = f"{target.mention} has {player.money} cookies"
+            else:
+                player : LucciUser = self.__checkUser(user)
+                response = f"{user.mention} has {player.money} cookies"
+        except:
+            response = self.logError("PAWPAW")
+        return response
+
     async def daily(self, user: discord.User, guild : discord.Guild) -> str:
         response : str = ""
         try:
@@ -376,6 +391,65 @@ class LucciServer:
             """)
         except:
             response = self.logError("WATERMELON")
+        return response
+
+    async def rps(self, bet : int, interaction : discord.Interaction = None, message : discord.Message = None):
+        """Play RPS with either a text channel or an interaction."""
+
+        try:
+            if message:
+                user : discord.user = message.author
+            else:
+                user : discord.user = interaction.user
+
+            embed = discord.Embed(
+                title="Rock Paper Scissors",
+                description=f"{user.mention}, choose your move below!\nBet: {bet}",
+                color=discord.Color.blurple()
+            )
+            view = RPSView(user, bet)
+
+            # Send the message based on context
+            if interaction:
+                server : LucciGuild = self.checkGuild(interaction.guild)
+                luser : LucciUser = self.__checkUser(interaction.user)
+                if luser.money < bet:
+                    return f"You don't have {bet} cookies to play with"
+                if interaction.response.is_done():
+                    msg = await interaction.followup.send(embed=embed, view=view)
+                else:
+                    await interaction.response.send_message(embed=embed, view=view)
+                    msg = await interaction.original_response()
+            else:
+                server : LucciGuild = self.checkGuild(message.guild)
+                luser : LucciUser = self.__checkUser(message.author)
+                if luser.money < bet:
+                    return f"You don't have {bet} cookies to play with"
+                msg = await message.channel.send(embed=embed, view=view)
+            
+
+            # Wait for the result
+            try:
+                await asyncio.wait_for(view.event.wait(), timeout=30)
+            except asyncio.TimeoutError:
+                await msg.edit(content="⏰ Game timed out!", embed=None, view=None)
+                return "No result (timeout)."
+
+            # return view.result
+            if "tie" not in view.result:
+                if "win" in view.result:
+                    luser.money += bet
+                    response = f"{luser.name} won {bet} cookies 🎉."
+                elif "lose" in view.result:
+                    luser.money = max(luser.money - bet, 0)
+                    response = f"{luser.name} lost {bet} cookies 😢"
+
+                # 13. Update database
+                self.__updateUser(luser, ["money"])
+            else:
+                response = f"{luser.name} had their cookies returned to them"
+        except:
+            response = self.logError("TOMATO")
         return response
     
     async def set_daily_limits(self, guild : discord.Guild, daily_min : int = -1, daily_max : int = -1):

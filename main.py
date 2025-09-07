@@ -50,6 +50,13 @@ async def register_guild(guild : discord.Guild):
     )
     guildCount+=1
 
+    # Register cookies
+    @tree.command(name="cookies", description="Allows the user to check how many cookies they or another user have", guild=discord.Object(id=guild.id))
+    async def cookies(interaction: discord.Interaction, target : discord.User = None):
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.cookies(interaction.user, target))
+
     # Register daily
     @tree.command(name="daily", description="Allows the user to collect a daily bonus", guild=discord.Object(id=guild.id))
     async def daily(interaction: discord.Interaction):
@@ -105,6 +112,14 @@ async def register_guild(guild : discord.Guild):
         await interaction.response.defer()
         server : LucciServer = servers[interaction.guild.id]
         await interaction.followup.send(await server.next_rank(user, interaction.guild))
+
+    # Register rps
+    print(f"Registering rps command with {guild.name}")
+    @tree.command(name="rps", description="Used to play rock, paper, scissors, to earn cookies", guild=discord.Object(id=guild.id))
+    async def rps(interaction: discord.Interaction, bet : int):
+        await interaction.response.defer()
+        server : LucciServer = servers[interaction.guild.id]
+        await interaction.followup.send(await server.rps(bet, interaction=interaction))
 
     # Register whoami
     print(f"Registering whoami command with {guild.name}")
@@ -337,7 +352,12 @@ async def on_message(message : discord.Message):
             if task == None or task.done():
                 task = bot.loop.create_task(check_rank(message))
             # Command check
-            formatted : str = re.sub(r'[\t\r\ ]+', '', message.content.lower())
+            formatted : str = re.sub(r'[\t\r\ ]+', ' ', message.content.lower())
+
+            # Register cookies
+            if re.search(r'^\!cookies$', formatted):
+                await message.channel.send(await servers[message.guild.id].cookies(message.author))
+            
             # Register !daily
             if re.search(r'^\!daily$', formatted):
                 await message.channel.send(await servers[message.guild.id].daily(message.author, message.guild))
@@ -356,6 +376,9 @@ async def on_message(message : discord.Message):
             # Register !next_rank
             if re.search(r'^\!nextrank$', formatted):
                 await message.channel.send(await servers[message.guild.id].next_rank(message.author, message.guild))
+            
+            if re.search(r'^\!rps\ [0-9]+$', formatted):
+                await message.channel.send(await servers[message.guild.id].rps(int(formatted.split(' ')[1]), message=message))
 
             # Register !leaderboard
             if re.search(r'^\!leaderboard$', formatted):
